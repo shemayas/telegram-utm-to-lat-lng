@@ -2,7 +2,6 @@ import TelegramBot, { Message } from "node-telegram-bot-api";
 import dotenv from "dotenv";
 import { getMapInfoByUtmText } from "./utils";
 
-
 dotenv.config();
 
 const token = process.env.BOT_TOKEN;
@@ -11,7 +10,6 @@ if (!token) {
 }
 
 const bot = new TelegramBot(token, { polling: true });
-
 
 bot.on("message", (msg: Message) => {
   const chatId = msg.chat.id;
