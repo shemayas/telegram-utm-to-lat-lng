@@ -1,5 +1,6 @@
 import utm from "utm";
-import { Utm } from "./types";
+
+import type { Utm } from "./types";
 
 export const getMapInfoByUtmText = (text: string) => {
   if (!text) throw new Error();

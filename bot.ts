@@ -1,6 +1,6 @@
 import TelegramBot, { Message } from "node-telegram-bot-api";
 import dotenv from "dotenv";
-import { getMapInfoByUtmText } from "./utils";
+import { getMapInfoByUtmText } from "./api/utils";
 
 dotenv.config();
 
