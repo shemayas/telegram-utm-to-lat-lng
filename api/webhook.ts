@@ -17,14 +17,14 @@ export default async function handler(
   const update = (await request.body) as Message;
   const {
     text,
-    chat: { id },
+    chat,
   } = update;
 
   if (!text) {
     response.status(400).json({ message: "No text found in the message" });
   }
 
-  const chatId = id ?? "6962583091";
+  const chatId = chat?.id ?? "6962583091";
   try {
     await bot.sendLocation(chatId, 37.7749, -122.4194);
     await bot.sendMessage(chatId, "Here is a location!");
