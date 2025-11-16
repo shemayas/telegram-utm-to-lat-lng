@@ -4,9 +4,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "tsx bot.ts",
-    "build": "tsc",
-    "start": "node dist/bot.js"
+    "dev": "concurrently \"npm run build:dev\" \"vercel dev\"",
+    "build:dev": "ncc build api/webhook.ts --external utm --watch",
+    "build": "ncc build api/webhook.ts -o dist --external utm",
+    "start": "vercel dev"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +24,8 @@
     "@types/dotenv": "^8.2.3",
     "@types/node": "^24.5.1",
     "@types/node-telegram-bot-api": "^0.64.11",
+    "@vercel/ncc": "^0.38.4",
+    "concurrently": "^9.2.1",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2"
   }
