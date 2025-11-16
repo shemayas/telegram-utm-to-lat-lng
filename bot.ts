@@ -18,7 +18,12 @@ bot.on("message", (msg: Message) => {
     const text = msg.text?.trim();
     if (!text) throw new Error();
 
-    const { mapUrl, latitude, longitude } = getMapInfoByUtmText(text);
+    const mapInfo = getMapInfoByUtmText(text);
+    if (mapInfo.success === false) {
+      throw new Error(mapInfo.error);
+    }
+    const { mapUrl, latitude, longitude } = mapInfo.data;
+    // const { mapUrl, latitude, longitude } = getMapInfoByUtmText(text);
 
     bot.sendLocation(chatId, latitude, longitude);
 
