@@ -44,9 +44,7 @@ export default async function handler(
       (error instanceof Error ? error.message : String(error)) ||
       "Please send valid UTM coordinates.";
     await bot.sendMessage(chatId, msg);
-    return response
-      .status(400)
-      .json({ message: msg });
+    return response.status(400).json({ message: msg });
   }
   return response.status(200).json({ message: "Webhook handled" });
 }
