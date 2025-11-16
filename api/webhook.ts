@@ -14,9 +14,8 @@ export default async function handler(
       .status(500)
       .json({ message: "Missing BOT_TOKEN in environment" });
   }
-  console.log({ request: request.body });
 
-  const update = (await request.body) as Message;
+  const update = (await request.body.message) as Message;
   const { text, chat } = update;
   const utmText = text?.trim();
 
