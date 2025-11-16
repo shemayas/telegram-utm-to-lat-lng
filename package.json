@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "concurrently \"npm run build:dev\" \"vercel dev\"",
     "build:dev": "ncc build api/webhook.ts --external utm --watch",
-    "build": "ncc build api/webhook.ts -o dist --external utm",
+    "build": "ncc build api/webhook.ts -o dist --external utm -m",
+    "deploy:prod": "npm run build && vercel --prod",
     "start": "vercel dev"
   },
   "keywords": [],
