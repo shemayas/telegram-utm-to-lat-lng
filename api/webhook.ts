@@ -10,22 +10,22 @@ export default async function handler(
   response: VercelResponse
 ) {
   if (!BOT_TOKEN) {
+    console.log({ message: "Missing BOT_TOKEN in environment" });
     return response
-      .status(500)
+      .status(200)
       .json({ message: "Missing BOT_TOKEN in environment" });
   }
 
   const update = (await request.body.message) as Message;
   const { text, chat } = update;
   const utmText = text?.trim();
+  const chatId = chat?.id ?? "6962583091";
+  console.log({ chat });
 
   if (!utmText) {
-    return response
-      .status(400)
-      .json({ message: "No text found in the message" });
+    await bot.sendMessage(chatId, "No text found in the message");
+    return response.status(200);
   }
-
-  const chatId = chat?.id ?? "6962583091";
 
   try {
     const mapInfo = getMapInfoByUtmText(utmText);
@@ -44,7 +44,7 @@ export default async function handler(
       (error instanceof Error ? error.message : String(error)) ||
       "Please send valid UTM coordinates.";
     await bot.sendMessage(chatId, msg);
-    return response.status(400).json({ message: msg });
+    return response.status(200).json({ message: msg });
   }
   return response.status(200).json({ message: "Webhook handled" });
 }
