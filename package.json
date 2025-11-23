@@ -4,8 +4,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"npm run build:dev\" \"vercel dev\"",
-    "build:dev": "ncc build api/webhook.ts --external utm --watch",
+    "dev": "concurrently -c green,blue -n 'Build,Vercel' \"npm run build:dev\" \"vercel dev\"",
+    "build:dev": "ncc build api/webhook.ts --external utm --watch -s",
     "build": "ncc build api/webhook.ts -o dist --external utm -m",
     "deploy:prod": "npm run build && vercel --prod",
     "start": "vercel dev"
