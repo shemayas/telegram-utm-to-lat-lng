@@ -16,11 +16,11 @@ export default async function handler(
       .json({ message: "Missing BOT_TOKEN in environment" });
   }
 
-  const update = (await request.body.message) as Message;
-  const { text, chat } = update;
+  const update = (await request?.body?.message) as Message | undefined;
+  console.log({ update });
+  const { text, chat } = update ?? {};
   const utmText = text?.trim();
   const chatId = chat?.id ?? "6962583091";
-  console.log({ chat });
 
   if (!utmText) {
     await bot.sendMessage(chatId, "No text found in the message");
