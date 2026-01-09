@@ -24,7 +24,7 @@ export default async function handler(
 
   if (!utmText) {
     await bot.sendMessage(chatId, "No text found in the message");
-    return response.status(200);
+    return response.status(200).send("OK");
   }
 
   try {
