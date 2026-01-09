@@ -9,42 +9,59 @@ export default async function handler(
   request: VercelRequest,
   response: VercelResponse
 ) {
-  if (!BOT_TOKEN) {
-    console.log({ message: "Missing BOT_TOKEN in environment" });
-    return response
-      .status(200)
-      .json({ message: "Missing BOT_TOKEN in environment" });
-  }
-
-  const update = (await request?.body?.message) as Message | undefined;
-  console.log({ update });
-  const { text, chat } = update ?? {};
-  const utmText = text?.trim();
-  const chatId = chat?.id ?? "6962583091";
-
-  if (!utmText) {
-    await bot.sendMessage(chatId, "No text found in the message");
-    return response.status(200).send("OK");
+  // 1. Immediate Safety Check
+  if (request.method !== "POST") {
+    return response.status(405).send("Method Not Allowed");
   }
 
   try {
-    const mapInfo = getMapInfoByUtmText(utmText);
-    if (mapInfo.success === false) {
-      throw new Error(mapInfo.error);
+    // 2. Data Parsing (Note: request.body is NOT a promise in Vercel)
+    const update = request.body?.message as Message | undefined;
+
+    if (!update) {
+      return response.status(200).send("No message update received");
     }
-    const { mapUrl, latitude, longitude } = mapInfo.data;
-    await bot.sendLocation(chatId, latitude, longitude);
-    await bot.sendMessage(
-      chatId,
-      mapUrl ? `Here is the location: ${mapUrl}` : "Conversion failed.",
-      { disable_web_page_preview: false }
-    );
+
+    const { text, chat } = update;
+    const utmText = text?.trim();
+    const chatId = chat?.id ?? "6962583091";
+
+    // 3. Logic: No Text Found
+    if (!utmText) {
+      await bot.sendMessage(chatId, "No text found in the message");
+      return response.status(200).send("Acknowledged: No text");
+    }
+
+    // 4. Logic: Main Processing
+    const mapInfo = getMapInfoByUtmText(utmText);
+
+    if (mapInfo.success === false) {
+      await bot.sendMessage(
+        chatId,
+        mapInfo.error || "Please send valid UTM coordinates."
+      );
+    } else {
+      const { mapUrl, latitude, longitude } = mapInfo.data;
+
+      // We use Promise.all to send these concurrently to save time
+      await Promise.all([
+        bot.sendLocation(chatId, latitude, longitude),
+        bot.sendMessage(
+          chatId,
+          mapUrl ? `Here is the location: ${mapUrl}` : "Conversion failed.",
+          { disable_web_page_preview: false }
+        ),
+      ]);
+    }
   } catch (error) {
-    const msg =
-      (error instanceof Error ? error.message : String(error)) ||
-      "Please send valid UTM coordinates.";
-    await bot.sendMessage(chatId, msg);
-    return response.status(200).json({ message: msg });
+    console.error("Critical Error:", error);
+    // Even if everything crashes, we tell Telegram "OK"
+    // so it doesn't spam your bot with retries.
+  } finally {
+    // 5. The Final Acknowledge
+    // This ensures Vercel closes the connection properly
+    if (!response.writableEnded) {
+      return response.status(200).json({ status: "success" });
+    }
   }
-  return response.status(200).json({ message: "Webhook handled" });
 }
